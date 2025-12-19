@@ -1,0 +1,37 @@
+@page
+@model WebApplication1.Pages.OutOfStock.MyModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@{
+    ViewData["Title"] = "我的缺书记录";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">我的缺书记录</h1>
+    <a class="btn btn-primary" asp-page="/OutOfStock/Create">新增登记</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>时间</th>
+                <th>书名</th>
+                <th class="text-end">数量</th>
+                <th>状态</th>
+                <th>管理员回复</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Rows)
+            {
+                <tr>
+                    <td class="text-muted">@r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@r.BookTitle</td>
+                    <td class="text-end">@r.RequestedQty</td>
+                    <td><span class="badge text-bg-secondary">@r.StatusText</span></td>
+                    <td>@(string.IsNullOrWhiteSpace(r.AdminReply) ? "-" : r.AdminReply)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,48 @@
+@page
+@model WebApplication1.Pages.Admin.Books.IndexModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@{
+    ViewData["Title"] = "图书管理";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">图书管理</h1>
+    <a class="btn btn-primary" asp-page="/Admin/Books/Create">新增图书</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-10">
+        <input class="form-control" name="q" value="@Model.Query" placeholder="搜索书名/书号" />
+    </div>
+    <div class="col-md-2 d-grid">
+        <button class="btn btn-outline-primary" type="submit">搜索</button>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>书号</th>
+                <th>书名</th>
+                <th class="text-end">价格</th>
+                <th class="text-end">库存</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in Model.Books)
+            {
+                <tr>
+                    <td class="text-muted">@b.BookNo</td>
+                    <td>@b.Title</td>
+                    <td class="text-end">? @b.Price.ToString("0.00")</td>
+                    <td class="text-end">@b.StockQty</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-page="/Admin/Books/Edit" asp-route-id="@b.BookId">编辑</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

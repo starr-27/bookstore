@@ -1,0 +1,49 @@
+@page "{id:long}"
+@model WebApplication1.Pages.Admin.Books.EditModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@{
+    ViewData["Title"] = "编辑图书";
+}
+
+@if (Model.Input is null)
+{
+    <div class="alert alert-warning">未找到图书</div>
+}
+else
+{
+    <h1 class="h4 mb-3">编辑图书</h1>
+
+    <form method="post" class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">书号</label>
+            <input class="form-control" asp-for="Input.BookNo" />
+            <span class="text-danger" asp-validation-for="Input.BookNo"></span>
+        </div>
+        <div class="col-md-8">
+            <label class="form-label">书名</label>
+            <input class="form-control" asp-for="Input.Title" />
+            <span class="text-danger" asp-validation-for="Input.Title"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">价格</label>
+            <input class="form-control" asp-for="Input.Price" />
+            <span class="text-danger" asp-validation-for="Input.Price"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">库存</label>
+            <input class="form-control" asp-for="Input.StockQty" />
+            <span class="text-danger" asp-validation-for="Input.StockQty"></span>
+        </div>
+
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit">保存</button>
+            <a class="btn btn-link" asp-page="/Admin/Books/Index">返回</a>
+        </div>
+    </form>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

@@ -1,0 +1,60 @@
+@page
+@model WebApplication1.Pages.Admin.Stock.PurchaseInModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@{
+    ViewData["Title"] = "采购入库";
+}
+
+<h1 class="h4 mb-3">采购入库</h1>
+
+<form method="post" class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">供应商</label>
+        <select class="form-select" asp-for="Input.SupplierId">
+            <option value="">请选择</option>
+            @foreach (var s in Model.SupplierOptions)
+            {
+                <option value="@s.SupplierId">@s.SupplierName</option>
+            }
+        </select>
+        <span class="text-danger" asp-validation-for="Input.SupplierId"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">书籍</label>
+        <select class="form-select" asp-for="Input.BookId">
+            <option value="">请选择</option>
+            @foreach (var b in Model.BookOptions)
+            {
+                <option value="@b.BookId">@b.Title</option>
+            }
+        </select>
+        <span class="text-danger" asp-validation-for="Input.BookId"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">数量</label>
+        <input class="form-control" asp-for="Input.Qty" />
+        <span class="text-danger" asp-validation-for="Input.Qty"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">进货单价</label>
+        <input class="form-control" asp-for="Input.UnitCost" />
+        <span class="text-danger" asp-validation-for="Input.UnitCost"></span>
+    </div>
+
+    <div class="col-12">
+        <label class="form-label">备注</label>
+        <input class="form-control" asp-for="Input.Note" />
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-success" type="submit">确认入库</button>
+        <a class="btn btn-link" asp-page="/Admin/Stock/Index">返回</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,67 @@
+@page "{id:long}"
+@model WebApplication1.Pages.Orders.DetailsModel
+@{
+    ViewData["Title"] = "订单详情";
+}
+
+@if (Model.Order is null)
+{
+    <div class="alert alert-warning">未找到订单</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 mb-0">订单 #@Model.Order.OrderId</h1>
+        <span class="badge text-bg-secondary">@Model.Order.StatusText</span>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <div class="text-muted small">收货信息</div>
+                    <div>@Model.Order.ReceiverName / @Model.Order.ReceiverPhone</div>
+                    <div>@Model.Order.ReceiverAddr</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small">时间</div>
+                    <div>下单：@Model.Order.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                    <div>支付：@(Model.Order.PaidAt.HasValue ? Model.Order.PaidAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">订单明细</div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>书名</th>
+                        <th class="text-end">单价</th>
+                        <th class="text-end">数量</th>
+                        <th class="text-end">小计</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var i in Model.Order.Items)
+                    {
+                        <tr>
+                            <td>@i.Title</td>
+                            <td class="text-end"><span class="currency">?</span> @i.UnitPrice.ToString("0.00")</td>
+                            <td class="text-end">@i.Qty</td>
+                            <td class="text-end"><span class="currency">?</span> @i.LineAmount.ToString("0.00")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3" class="text-end">合计</th>
+                        <th class="text-end"><span class="currency">?</span> @Model.Order.TotalAmount.ToString("0.00")</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+}

@@ -1,0 +1,49 @@
+@page
+@model WebApplication1.Pages.OutOfStock.CreateModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@{
+    ViewData["Title"] = "缺书登记";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">缺书登记</h1>
+    <a class="btn btn-link" asp-page="/OutOfStock/My">我的缺书记录</a>
+</div>
+
+<form method="post" class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">书籍（可选）</label>
+        <select class="form-select" asp-for="Input.BookId">
+            <option value="">请选择</option>
+            @foreach (var b in Model.BookOptions)
+            {
+                <option value="@b.BookId">@b.Title</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">书名（未找到书时可手填）</label>
+        <input class="form-control" asp-for="Input.BookTitle" />
+        <span class="text-danger" asp-validation-for="Input.BookTitle"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">期望数量</label>
+        <input class="form-control" asp-for="Input.RequestedQty" />
+        <span class="text-danger" asp-validation-for="Input.RequestedQty"></span>
+    </div>
+
+    <div class="col-12">
+        <label class="form-label">备注</label>
+        <textarea class="form-control" rows="3" asp-for="Input.Note"></textarea>
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-primary" type="submit">提交缺书记录</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

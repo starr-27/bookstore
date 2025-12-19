@@ -1,0 +1,54 @@
+@page "{id:long}"
+@model WebApplication1.Pages.Admin.Suppliers.EditModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@{
+    ViewData["Title"] = "编辑供应商";
+}
+
+@if (Model.Input is null)
+{
+    <div class="alert alert-warning">未找到供应商</div>
+}
+else
+{
+    <h1 class="h4 mb-3">编辑供应商</h1>
+
+    <form method="post" class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">名称</label>
+            <input class="form-control" asp-for="Input.SupplierName" />
+            <span class="text-danger" asp-validation-for="Input.SupplierName"></span>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">联系人</label>
+            <input class="form-control" asp-for="Input.ContactName" />
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">电话</label>
+            <input class="form-control" asp-for="Input.Phone" />
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">邮箱</label>
+            <input class="form-control" asp-for="Input.Email" />
+        </div>
+        <div class="col-12">
+            <label class="form-label">地址</label>
+            <input class="form-control" asp-for="Input.Address" />
+        </div>
+        <div class="col-12">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" asp-for="Input.IsActive" />
+                <label class="form-check-label">启用</label>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit">保存</button>
+            <a class="btn btn-link" asp-page="/Admin/Suppliers/Index">返回</a>
+        </div>
+    </form>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

@@ -1,0 +1,88 @@
+@page "{id:long}"
+@model WebApplication1.Pages.Admin.Orders.DetailsModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@{
+    ViewData["Title"] = "订单处理";
+}
+
+@if (Model.Order is null)
+{
+    <div class="alert alert-warning">未找到订单</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h4 mb-0">订单 #@Model.Order.OrderId</h1>
+            <div class="text-muted small">@Model.Order.CustomerEmail</div>
+        </div>
+        <span class="badge text-bg-secondary">@Model.Order.StatusText</span>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <div class="text-muted small">收货信息</div>
+                    <div>@Model.Order.ReceiverName / @Model.Order.ReceiverPhone</div>
+                    <div>@Model.Order.ReceiverAddr</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small">金额</div>
+                    <div class="fw-semibold">? @Model.Order.TotalAmount.ToString("0.00")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">发货信息</div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="Ship" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">快递公司</label>
+                    <input class="form-control" asp-for="ShipInput.Carrier" />
+                    <span class="text-danger" asp-validation-for="ShipInput.Carrier"></span>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">运单号</label>
+                    <input class="form-control" asp-for="ShipInput.TrackingNo" />
+                    <span class="text-danger" asp-validation-for="ShipInput.TrackingNo"></span>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-success" type="submit">保存并标记为已发货</button>
+                    <a class="btn btn-link" asp-page="/Admin/Orders/Index">返回</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">订单明细</div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>书名</th>
+                        <th class="text-end">单价</th>
+                        <th class="text-end">数量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var i in Model.Order.Items)
+                    {
+                        <tr>
+                            <td>@i.Title</td>
+                            <td class="text-end">? @i.UnitPrice.ToString("0.00")</td>
+                            <td class="text-end">@i.Qty</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

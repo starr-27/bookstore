@@ -1,0 +1,54 @@
+@page
+@model WebApplication1.Pages.Admin.Stock.IndexModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@{
+    ViewData["Title"] = "库存流水";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">库存流水</h1>
+    <a class="btn btn-primary" asp-page="/Admin/Stock/PurchaseIn">采购入库</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <select class="form-select" name="bookId">
+            <option value="">全部书籍</option>
+            @foreach (var b in Model.BookOptions)
+            {
+                <option value="@b.BookId" selected="@(Model.BookId == b.BookId ? "selected" : null)">@b.Title</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-8 d-grid d-md-flex justify-content-md-end">
+        <button class="btn btn-outline-primary" type="submit">筛选</button>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>时间</th>
+                <th>书籍</th>
+                <th>类型</th>
+                <th class="text-end">变动</th>
+                <th class="text-end">变动后库存</th>
+                <th>备注</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Rows)
+            {
+                <tr>
+                    <td class="text-muted">@r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@r.BookTitle</td>
+                    <td>@r.ChangeType</td>
+                    <td class="text-end">@r.QtyChange</td>
+                    <td class="text-end">@r.QtyAfter</td>
+                    <td>@(r.Note ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

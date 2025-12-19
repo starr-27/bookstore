@@ -1,0 +1,96 @@
+@page "{id}"
+@model WebApplication1.Pages.Admin.Customers.EditModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@{
+    ViewData["Title"] = "客户管理";
+}
+
+@if (Model.Vm is null)
+{
+    <div class="alert alert-warning">未找到客户</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h4 mb-0">客户管理</h1>
+            <div class="text-muted small">@Model.Vm.Email</div>
+        </div>
+        <a class="btn btn-link" asp-page="/Admin/Customers/Index">返回列表</a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6">客户信息</h2>
+                    <form method="post" asp-page-handler="SaveProfile" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">姓名</label>
+                            <input class="form-control" asp-for="ProfileInput.FullName" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">地址</label>
+                            <input class="form-control" asp-for="ProfileInput.Address" />
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary" type="submit">保存信息</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h2 class="h6">账户余额（充值）</h2>
+                    <div class="small text-muted mb-2">当前余额：<span class="currency">?</span> @Model.Vm.AccountBalance.ToString("0.00")</div>
+                    <form method="post" asp-page-handler="Recharge" class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">充值金额</label>
+                            <input class="form-control" asp-for="RechargeInput.Amount" />
+                            <span class="text-danger" asp-validation-for="RechargeInput.Amount"></span>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-success" type="submit">确认收款并增加余额</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6">信用管理</h2>
+                    <form method="post" asp-page-handler="UpdateCredit" class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">信用等级</label>
+                            <select class="form-select" asp-for="CreditInput.CreditLevel">
+                                @foreach (var lvl in Model.CreditLevels)
+                                {
+                                    <option value="@lvl">L@((int)lvl)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">透支额度（L3/L4 生效，L5 无限制，L1/L2 不可透支）</label>
+                            <input class="form-control" asp-for="CreditInput.OverdraftLimit" />
+                            <span class="text-danger" asp-validation-for="CreditInput.OverdraftLimit"></span>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-outline-primary" type="submit">更新信用</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-3 small text-muted">
+                        折扣规则：L1=10% 不可透支；L2=15% 不可透支；L3=15% 可透支(限额)；L4=20% 可透支(限额)；L5=25% 可透支(不限额)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

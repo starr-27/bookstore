@@ -1,0 +1,66 @@
+@page "{id:long}"
+@model WebApplication1.Pages.Admin.OutOfStock.EditModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@{
+    ViewData["Title"] = "处理缺书记录";
+}
+
+@if (Model.Vm is null)
+{
+    <div class="alert alert-warning">未找到记录</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h4 mb-0">处理缺书记录 #@Model.Vm.OutOfStockRequestId</h1>
+            <div class="text-muted small">@Model.Vm.CustomerEmail</div>
+        </div>
+        <a class="btn btn-link" asp-page="/Admin/OutOfStock/Index">返回</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">书名</dt>
+                <dd class="col-sm-9">@Model.Vm.BookTitle</dd>
+
+                <dt class="col-sm-3">数量</dt>
+                <dd class="col-sm-9">@Model.Vm.RequestedQty</dd>
+
+                <dt class="col-sm-3">当前状态</dt>
+                <dd class="col-sm-9">@Model.Vm.StatusText</dd>
+
+                <dt class="col-sm-3">顾客备注</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Vm.Note) ? "-" : Model.Vm.Note)</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">状态</label>
+                    <select class="form-select" asp-for="Input.Status">
+                        @foreach (var s in Model.StatusOptions)
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">管理员回复</label>
+                    <input class="form-control" asp-for="Input.AdminReply" />
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

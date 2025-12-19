@@ -1,0 +1,55 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "书籍目录";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-1">书籍目录</h1>
+        <div class="text-muted">支持按书名/书号/作者/关键字搜索</div>
+    </div>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-sm-9 col-md-10">
+        <input class="form-control" name="q" value="@Model.Query" placeholder="输入关键词，例如：ISBN / 书名 / 作者" />
+    </div>
+    <div class="col-sm-3 col-md-2 d-grid">
+        <button class="btn btn-primary" type="submit">搜索</button>
+    </div>
+</form>
+
+@if (Model.Books.Count == 0)
+{
+    <div class="alert alert-light border">暂无数据</div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+        @foreach (var b in Model.Books)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <h2 class="h6 mb-1">@b.Title</h2>
+                            <span class="badge text-bg-secondary">@b.StockQty</span>
+                        </div>
+                        <div class="text-muted small mb-2">@b.BookNo</div>
+                        <div class="small mb-2">
+                            <span class="text-muted">作者：</span>@b.AuthorsText
+                        </div>
+                        <div class="small mb-2">
+                            <span class="text-muted">出版社：</span>@(b.PublisherName ?? "-")
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-semibold">¥ @b.Price.ToString("0.00")</div>
+                            <a class="btn btn-sm btn-outline-primary" asp-page="/Books/Details" asp-route-id="@b.BookId">查看</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

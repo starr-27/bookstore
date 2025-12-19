@@ -1,0 +1,51 @@
+@page
+@model WebApplication1.Pages.Admin.Customers.IndexModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@{
+    ViewData["Title"] = "客户管理";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">客户管理</h1>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-10">
+        <input class="form-control" name="q" value="@Model.Query" placeholder="按邮箱搜索" />
+    </div>
+    <div class="col-md-2 d-grid">
+        <button class="btn btn-outline-primary" type="submit">搜索</button>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>邮箱</th>
+                <th>姓名</th>
+                <th>地址</th>
+                <th class="text-end">余额</th>
+                <th class="text-end">信用等级</th>
+                <th class="text-end">透支额度</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model.Customers)
+            {
+                <tr>
+                    <td>@c.Email</td>
+                    <td>@(string.IsNullOrWhiteSpace(c.FullName) ? "-" : c.FullName)</td>
+                    <td class="text-truncate" style="max-width: 260px">@(string.IsNullOrWhiteSpace(c.Address) ? "-" : c.Address)</td>
+                    <td class="text-end"><span class="currency">?</span> @c.AccountBalance.ToString("0.00")</td>
+                    <td class="text-end">L@c.CreditLevel</td>
+                    <td class="text-end"><span class="currency">?</span> @c.OverdraftLimit.ToString("0.00")</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" asp-page="/Admin/Customers/Edit" asp-route-id="@c.UserId">管理</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

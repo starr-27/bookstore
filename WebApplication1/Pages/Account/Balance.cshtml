@@ -1,0 +1,54 @@
+@page
+@model WebApplication1.Pages.Account.BalanceModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@{
+    ViewData["Title"] = "我的余额";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">我的余额</h1>
+    <a class="btn btn-link" asp-page="/Index">返回目录</a>
+</div>
+
+@if (Model.Profile is null)
+{
+    <div class="alert alert-warning">未找到账户信息</div>
+}
+else
+{
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="text-muted small">当前余额</div>
+                    <div class="display-6"><span class="currency">?</span> @Model.Profile.AccountBalance.ToString("0.00")</div>
+                    <div class="text-muted small mt-2">信用等级：L@((int)Model.Profile.CreditLevel)（折扣 @((WebApplication1.Data.Entities.CreditLevelRules.DiscountRate(Model.Profile.CreditLevel) * 100).ToString("0"))%）</div>
+                    <div class="text-muted small">透支额度：@(WebApplication1.Data.Entities.CreditLevelRules.UnlimitedOverdraft(Model.Profile.CreditLevel) ? "无限" : ("? " + Model.Profile.OverdraftLimit.ToString("0.00")))</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6">充值（模拟收到款项）</h2>
+                    <form method="post" class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">充值金额</label>
+                            <input class="form-control" asp-for="Amount" />
+                            <span class="text-danger" asp-validation-for="Amount"></span>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-success" type="submit">确认充值</button>
+                        </div>
+                    </form>
+                    <div class="small text-muted mt-2">注：实际业务中应由管理员收款后充值；这里为演示方便提供自助充值。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

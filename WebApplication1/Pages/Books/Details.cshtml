@@ -1,0 +1,85 @@
+@page "{id:long}"
+@model WebApplication1.Pages.Books.DetailsModel
+@{
+    ViewData["Title"] = "书籍详情";
+}
+
+@if (Model.Book is null)
+{
+    <div class="alert alert-warning">未找到该书籍</div>
+}
+else
+{
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <h1 class="h4 mb-1">@Model.Book.Title</h1>
+            <div class="text-muted mb-3">@Model.Book.BookNo</div>
+
+            <dl class="row">
+                <dt class="col-sm-3">作者</dt>
+                <dd class="col-sm-9">@Model.Book.AuthorsText</dd>
+
+                <dt class="col-sm-3">出版社</dt>
+                <dd class="col-sm-9">@(Model.Book.PublisherName ?? "-")</dd>
+
+                <dt class="col-sm-3">关键字</dt>
+                <dd class="col-sm-9">@Model.Book.KeywordsText</dd>
+
+                <dt class="col-sm-3">供书商</dt>
+                <dd class="col-sm-9">@(Model.Book.SupplierName ?? "-")</dd>
+            </dl>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="h4 mb-3">? @Model.Book.Price.ToString("0.00")</div>
+                    <div class="text-muted mb-3">库存：@Model.Book.StockQty</div>
+
+                    @if (!User.Identity?.IsAuthenticated ?? true)
+                    {
+                        <div class="alert alert-light border small">登录后可下单购买</div>
+                        <a class="btn btn-primary w-100" asp-page="/Account/Login">登录</a>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="Buy">
+                            <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+                            <div class="mb-2">
+                                <label class="form-label">数量</label>
+                                <input class="form-control" type="number" min="1" max="999" asp-for="Qty" />
+                                <span class="text-danger" asp-validation-for="Qty"></span>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">收货人</label>
+                                <input class="form-control" asp-for="ReceiverName" />
+                                <span class="text-danger" asp-validation-for="ReceiverName"></span>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">电话</label>
+                                <input class="form-control" asp-for="ReceiverPhone" />
+                                <span class="text-danger" asp-validation-for="ReceiverPhone"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">地址</label>
+                                <textarea class="form-control" rows="2" asp-for="ReceiverAddr"></textarea>
+                                <span class="text-danger" asp-validation-for="ReceiverAddr"></span>
+                            </div>
+
+                            <button class="btn btn-success w-100" type="submit" @(Model.Book.StockQty == 0 ? "disabled" : null)>
+                                立即购买
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
