@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Data.Entities;
 
@@ -18,10 +19,21 @@ public class CreateModel : PageModel
     [BindProperty]
     public InputModel Input { get; set; } = new();
 
+    public List<CategoryOption> CategoryOptions { get; private set; } = new();
+
+    public class CategoryOption
+    {
+        public long CategoryId { get; set; }
+        public string CategoryName { get; set; } = default!;
+    }
+
     public class InputModel
     {
         [Required, StringLength(32)]
         public string BookNo { get; set; } = string.Empty;
+
+        [StringLength(40)]
+        public string? VolumeNo { get; set; }
 
         [Required, StringLength(200)]
         public string Title { get; set; } = string.Empty;
@@ -31,12 +43,19 @@ public class CreateModel : PageModel
 
         [Range(0, 1000000)]
         public uint StockQty { get; set; } = 0;
+
+        public long? CategoryId { get; set; }
     }
 
-    public void OnGet() { }
+    public async Task OnGetAsync()
+    {
+        await LoadOptionsAsync();
+    }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        await LoadOptionsAsync();
+
         if (!ModelState.IsValid)
         {
             return Page();
@@ -46,8 +65,10 @@ public class CreateModel : PageModel
         {
             BookNo = Input.BookNo.Trim(),
             Title = Input.Title.Trim(),
+            VolumeNo = string.IsNullOrWhiteSpace(Input.VolumeNo) ? null : Input.VolumeNo.Trim(),
             Price = Input.Price,
             StockQty = Input.StockQty,
+            CategoryId = Input.CategoryId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -56,5 +77,14 @@ public class CreateModel : PageModel
         await _db.SaveChangesAsync();
 
         return RedirectToPage("/Admin/Books/Index");
+    }
+
+    private async Task LoadOptionsAsync()
+    {
+        CategoryOptions = await _db.Categories
+            .AsNoTracking()
+            .OrderBy(c => c.CategoryName)
+            .Select(c => new CategoryOption { CategoryId = c.CategoryId, CategoryName = c.CategoryName })
+            .ToListAsync();
     }
 }

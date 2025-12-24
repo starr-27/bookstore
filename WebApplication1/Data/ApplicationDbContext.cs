@@ -12,6 +12,7 @@ namespace WebApplication1.Data
         }
 
         public DbSet<Book> Books => Set<Book>();
+        public DbSet<Category> Categories => Set<Category>();
         public DbSet<Author> Authors => Set<Author>();
         public DbSet<BookAuthor> BookAuthors => Set<BookAuthor>();
         public DbSet<Keyword> Keywords => Set<Keyword>();
@@ -36,8 +37,18 @@ namespace WebApplication1.Data
                 e.HasKey(x => x.BookId);
                 e.Property(x => x.BookNo).HasMaxLength(32);
                 e.Property(x => x.Title).HasMaxLength(200);
+                e.Property(x => x.VolumeNo).HasMaxLength(40);
                 e.Property(x => x.Price).HasPrecision(10, 2);
-                e.HasIndex(x => x.BookNo).IsUnique();
+                e.HasIndex(x => new { x.BookNo, x.VolumeNo }).IsUnique();
+
+                e.HasOne(x => x.Category).WithMany(x => x.Books).HasForeignKey(x => x.CategoryId);
+            });
+
+            builder.Entity<Category>(e =>
+            {
+                e.HasKey(x => x.CategoryId);
+                e.Property(x => x.CategoryName).HasMaxLength(80);
+                e.HasIndex(x => x.CategoryName).IsUnique();
             });
 
             builder.Entity<Author>(e =>

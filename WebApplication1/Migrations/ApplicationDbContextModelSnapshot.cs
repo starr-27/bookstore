@@ -239,7 +239,7 @@ namespace WebApplication1.Migrations
                     b.HasIndex("AuthorName")
                         .IsUnique();
 
-                    b.ToTable("Authors");
+                    b.ToTable("Authors", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.Book", b =>
@@ -255,6 +255,9 @@ namespace WebApplication1.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("varchar(32)");
 
+                    b.Property<long?>("CategoryId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
@@ -268,6 +271,9 @@ namespace WebApplication1.Migrations
                     b.Property<uint>("StockQty")
                         .HasColumnType("int unsigned");
 
+                    b.Property<bool>("SupplierCatalogEnabled")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<long?>("SupplierId")
                         .HasColumnType("bigint");
 
@@ -279,16 +285,22 @@ namespace WebApplication1.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("VolumeNo")
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
                     b.HasKey("BookId");
 
-                    b.HasIndex("BookNo")
-                        .IsUnique();
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("PublisherId");
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("Books");
+                    b.HasIndex("BookNo", "VolumeNo")
+                        .IsUnique();
+
+                    b.ToTable("Books", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.BookAuthor", b =>
@@ -309,7 +321,7 @@ namespace WebApplication1.Migrations
                     b.HasIndex("BookId", "AuthorId")
                         .IsUnique();
 
-                    b.ToTable("BookAuthors");
+                    b.ToTable("BookAuthors", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.BookKeyword", b =>
@@ -324,7 +336,28 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("KeywordId");
 
-                    b.ToTable("BookKeywords");
+                    b.ToTable("BookKeywords", (string)null);
+                });
+
+            modelBuilder.Entity("WebApplication1.Data.Entities.Category", b =>
+                {
+                    b.Property<long>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("CategoryId"));
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.HasKey("CategoryId");
+
+                    b.HasIndex("CategoryName")
+                        .IsUnique();
+
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.CustomerProfile", b =>
@@ -355,7 +388,7 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("CustomerProfiles");
+                    b.ToTable("CustomerProfiles", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.Keyword", b =>
@@ -376,7 +409,7 @@ namespace WebApplication1.Migrations
                     b.HasIndex("KeywordText")
                         .IsUnique();
 
-                    b.ToTable("Keywords");
+                    b.ToTable("Keywords", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.Order", b =>
@@ -421,7 +454,7 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("OrderId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.OrderItem", b =>
@@ -452,7 +485,7 @@ namespace WebApplication1.Migrations
                     b.HasIndex("OrderId", "BookId")
                         .IsUnique();
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.OutOfStockRequest", b =>
@@ -503,7 +536,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("Status", "CreatedAt");
 
-                    b.ToTable("OutOfStockRequests");
+                    b.ToTable("OutOfStockRequests", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.Publisher", b =>
@@ -524,7 +557,7 @@ namespace WebApplication1.Migrations
                     b.HasIndex("PublisherName")
                         .IsUnique();
 
-                    b.ToTable("Publishers");
+                    b.ToTable("Publishers", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.PurchaseOrder", b =>
@@ -551,7 +584,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("PurchaseOrders");
+                    b.ToTable("PurchaseOrders", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.PurchaseOrderItem", b =>
@@ -582,7 +615,7 @@ namespace WebApplication1.Migrations
                     b.HasIndex("PurchaseOrderId", "BookId")
                         .IsUnique();
 
-                    b.ToTable("PurchaseOrderItems");
+                    b.ToTable("PurchaseOrderItems", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.Shipment", b =>
@@ -615,7 +648,7 @@ namespace WebApplication1.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Shipments");
+                    b.ToTable("Shipments", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.StockLedger", b =>
@@ -649,7 +682,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("BookId", "CreatedAt");
 
-                    b.ToTable("StockLedgers");
+                    b.ToTable("StockLedgers", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.Supplier", b =>
@@ -685,7 +718,7 @@ namespace WebApplication1.Migrations
                     b.HasIndex("SupplierName")
                         .IsUnique();
 
-                    b.ToTable("Suppliers");
+                    b.ToTable("Suppliers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -741,6 +774,10 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("WebApplication1.Data.Entities.Book", b =>
                 {
+                    b.HasOne("WebApplication1.Data.Entities.Category", "Category")
+                        .WithMany("Books")
+                        .HasForeignKey("CategoryId");
+
                     b.HasOne("WebApplication1.Data.Entities.Publisher", "Publisher")
                         .WithMany("Books")
                         .HasForeignKey("PublisherId");
@@ -748,6 +785,8 @@ namespace WebApplication1.Migrations
                     b.HasOne("WebApplication1.Data.Entities.Supplier", "Supplier")
                         .WithMany("Books")
                         .HasForeignKey("SupplierId");
+
+                    b.Navigation("Category");
 
                     b.Navigation("Publisher");
 
@@ -901,6 +940,11 @@ namespace WebApplication1.Migrations
                     b.Navigation("Authors");
 
                     b.Navigation("Keywords");
+                });
+
+            modelBuilder.Entity("WebApplication1.Data.Entities.Category", b =>
+                {
+                    b.Navigation("Books");
                 });
 
             modelBuilder.Entity("WebApplication1.Data.Entities.Keyword", b =>

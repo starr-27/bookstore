@@ -11,7 +11,7 @@
 
 <form method="get" class="row g-2 mb-3">
     <div class="col-md-10">
-        <input class="form-control" name="q" value="@Model.Query" placeholder="°´ÓÊÏäËÑË÷" />
+        <input class="form-control" name="q" value="@Model.Query" placeholder="ËÑË÷¿Í»§ÓÊÏä" />
     </div>
     <div class="col-md-2 d-grid">
         <button class="btn btn-outline-primary" type="submit">ËÑË÷</button>
@@ -38,11 +38,20 @@
                     <td>@c.Email</td>
                     <td>@(string.IsNullOrWhiteSpace(c.FullName) ? "-" : c.FullName)</td>
                     <td class="text-truncate" style="max-width: 260px">@(string.IsNullOrWhiteSpace(c.Address) ? "-" : c.Address)</td>
-                    <td class="text-end"><span class="currency">?</span> @c.AccountBalance.ToString("0.00")</td>
-                    <td class="text-end">L@c.CreditLevel</td>
-                    <td class="text-end"><span class="currency">?</span> @c.OverdraftLimit.ToString("0.00")</td>
+                    <td class="text-end"><span class="currency">£¤</span> @c.AccountBalance.ToString("0.00")</td>
+                    <td class="text-end">L@(c.CreditLevel)</td>
                     <td class="text-end">
-                        <a class="btn btn-sm btn-outline-primary" asp-page="/Admin/Customers/Edit" asp-route-id="@c.UserId">¹ÜÀí</a>
+                        @if (c.CreditLevel >= 5)
+                        {
+                            <span class="badge text-bg-success">ÎÞÏÞ</span>
+                        }
+                        else
+                        {
+                            <span class="currency">£¤</span> @c.OverdraftLimit.ToString("0.00")
+                        }
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" asp-page="/Admin/Customers/Edit" asp-route-id="@c.UserId">±à¼­</a>
                     </td>
                 </tr>
             }

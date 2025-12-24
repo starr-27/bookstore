@@ -16,6 +16,9 @@ public class EditModel : PageModel
         _db = db;
     }
 
+    [TempData]
+    public string? SuccessMessage { get; set; }
+
     public CustomerVm? Vm { get; private set; }
 
     public CreditLevel[] CreditLevels { get; } =
@@ -26,6 +29,8 @@ public class EditModel : PageModel
         CreditLevel.Level4,
         CreditLevel.Level5
     ];
+
+    public string CreditRulesText { get; } = "L1=10% 不可透支；L2=15% 不可透支；L3=15% 可先发书后付款(限额)；L4=20% 可先发书后付款(限额)；L5=25% 可先发书后付款(不限额)";
 
     [BindProperty]
     public ProfileInputModel ProfileInput { get; set; } = new();
@@ -76,17 +81,83 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnPostSaveProfileAsync(string id)
     {
+        // Ignore other form sections' fields on this post (credit/recharge)
+        ModelState.Remove($"{nameof(CreditInput)}.{nameof(CreditInputModel.CreditLevel)}");
+        ModelState.Remove($"{nameof(CreditInput)}.{nameof(CreditInputModel.OverdraftLimit)}");
+        ModelState.Remove($"{nameof(RechargeInput)}.{nameof(RechargeInputModel.Amount)}");
+
+        if (!TryValidateModel(ProfileInput, nameof(ProfileInput)))
+        {
+            await LoadAsync(id);
+            return Page();
+        }
+
         var profile = await GetOrCreateProfileAsync(id);
 
         profile.FullName = ProfileInput.FullName?.Trim() ?? string.Empty;
         profile.Address = ProfileInput.Address?.Trim() ?? string.Empty;
 
         await _db.SaveChangesAsync();
-        return RedirectToPage(new { id });
+        return RedirectToPage("/Admin/Customers/Edit", new { id });
+    }
+
+    public async Task<IActionResult> OnPostSaveAsync(string id)
+    {
+        await LoadAsync(id);
+        if (Vm is null)
+        {
+            return NotFound();
+        }
+
+        await TryUpdateModelAsync(ProfileInput, nameof(ProfileInput));
+        await TryUpdateModelAsync(CreditInput, nameof(CreditInput));
+
+        var creditLevel = CreditInput.CreditLevel;
+        var overdraftLimit = decimal.Round(CreditInput.OverdraftLimit, 2, MidpointRounding.AwayFromZero);
+
+        if (!CreditLevelRules.CanOverdraft(creditLevel))
+        {
+            overdraftLimit = 0m;
+        }
+        else if (CreditLevelRules.UnlimitedOverdraft(creditLevel))
+        {
+            overdraftLimit = 0m;
+        }
+        else
+        {
+            if (overdraftLimit <= 0m)
+            {
+                ModelState.AddModelError($"{nameof(CreditInput)}.{nameof(CreditInputModel.OverdraftLimit)}", "L3/L4 必须设置大于 0 的透支额度");
+                await LoadAsync(id);
+                return Page();
+            }
+        }
+
+        var profile = await GetOrCreateProfileAsync(id);
+        profile.FullName = ProfileInput.FullName?.Trim() ?? string.Empty;
+        profile.Address = ProfileInput.Address?.Trim() ?? string.Empty;
+        profile.CreditLevel = creditLevel;
+        profile.OverdraftLimit = overdraftLimit;
+
+        if (!TryValidateModel(ProfileInput, nameof(ProfileInput)) || !TryValidateModel(CreditInput, nameof(CreditInput)))
+        {
+            await LoadAsync(id);
+            return Page();
+        }
+
+        await _db.SaveChangesAsync();
+        SuccessMessage = "信息已更新";
+        return RedirectToPage("/Admin/Customers/Edit", new { id });
     }
 
     public async Task<IActionResult> OnPostRechargeAsync(string id)
     {
+        // Ignore other form sections' fields on this post (profile/credit)
+        ModelState.Remove($"{nameof(ProfileInput)}.{nameof(ProfileInputModel.FullName)}");
+        ModelState.Remove($"{nameof(ProfileInput)}.{nameof(ProfileInputModel.Address)}");
+        ModelState.Remove($"{nameof(CreditInput)}.{nameof(CreditInputModel.CreditLevel)}");
+        ModelState.Remove($"{nameof(CreditInput)}.{nameof(CreditInputModel.OverdraftLimit)}");
+
         if (!ModelState.IsValid)
         {
             await LoadAsync(id);
@@ -97,23 +168,50 @@ public class EditModel : PageModel
         profile.AccountBalance = decimal.Round(profile.AccountBalance + RechargeInput.Amount, 2, MidpointRounding.AwayFromZero);
 
         await _db.SaveChangesAsync();
-        return RedirectToPage(new { id });
+        return RedirectToPage("/Admin/Customers/Edit", new { id });
     }
 
     public async Task<IActionResult> OnPostUpdateCreditAsync(string id)
     {
+        // Ignore other form sections' fields on this post (profile/recharge)
+        ModelState.Remove($"{nameof(ProfileInput)}.{nameof(ProfileInputModel.FullName)}");
+        ModelState.Remove($"{nameof(ProfileInput)}.{nameof(ProfileInputModel.Address)}");
+        ModelState.Remove($"{nameof(RechargeInput)}.{nameof(RechargeInputModel.Amount)}");
+
         if (!ModelState.IsValid)
         {
             await LoadAsync(id);
             return Page();
         }
 
+        var creditLevel = CreditInput.CreditLevel;
+        var overdraftLimit = decimal.Round(CreditInput.OverdraftLimit, 2, MidpointRounding.AwayFromZero);
+
+        if (!CreditLevelRules.CanOverdraft(creditLevel))
+        {
+            overdraftLimit = 0m;
+        }
+        else if (CreditLevelRules.UnlimitedOverdraft(creditLevel))
+        {
+            overdraftLimit = 0m;
+        }
+        else
+        {
+            if (overdraftLimit <= 0m)
+            {
+                ModelState.AddModelError($"{nameof(CreditInput)}.{nameof(CreditInputModel.OverdraftLimit)}", "L3/L4 必须设置大于 0 的透支额度");
+                await LoadAsync(id);
+                return Page();
+            }
+        }
+
         var profile = await GetOrCreateProfileAsync(id);
-        profile.CreditLevel = CreditInput.CreditLevel;
-        profile.OverdraftLimit = decimal.Round(CreditInput.OverdraftLimit, 2, MidpointRounding.AwayFromZero);
+        profile.CreditLevel = creditLevel;
+        profile.OverdraftLimit = overdraftLimit;
 
         await _db.SaveChangesAsync();
-        return RedirectToPage(new { id });
+        SuccessMessage = "信用信息已更新";
+        return RedirectToPage("/Admin/Customers/Edit", new { id });
     }
 
     private async Task<CustomerProfile> GetOrCreateProfileAsync(string userId)

@@ -7,6 +7,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h4 mb-0">缺书处理</h1>
+    <a class="btn btn-primary" asp-page="/Admin/PurchaseOrders/CreateFromOutOfStock">生成采购单</a>
 </div>
 
 <div class="table-responsive">
@@ -14,7 +15,7 @@
         <thead>
             <tr>
                 <th>时间</th>
-                <th>顾客</th>
+                <th>客户</th>
                 <th>书名</th>
                 <th class="text-end">数量</th>
                 <th>状态</th>
@@ -24,12 +25,20 @@
         <tbody>
             @foreach (var r in Model.Rows)
             {
+                var status = (r.StatusText ?? string.Empty).ToLowerInvariant();
+                var badgeClass = status.Contains("done") || status.Contains("resolved") || status.Contains("closed")
+                    ? "text-bg-success"
+                    : status.Contains("cancel")
+                        ? "text-bg-danger"
+                        : status.Contains("processing") || status.Contains("purch")
+                            ? "text-bg-info"
+                            : "text-bg-warning";
                 <tr>
                     <td class="text-muted">@r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
                     <td>@r.CustomerEmail</td>
                     <td>@r.BookTitle</td>
                     <td class="text-end">@r.RequestedQty</td>
-                    <td><span class="badge text-bg-secondary">@r.StatusText</span></td>
+                    <td><span class="badge @badgeClass">@r.StatusText</span></td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-primary" asp-page="/Admin/OutOfStock/Edit" asp-route-id="@r.OutOfStockRequestId">处理</a>
                     </td>

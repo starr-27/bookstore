@@ -12,7 +12,7 @@
 
 <form method="get" class="row g-2 mb-3">
     <div class="col-md-10">
-        <input class="form-control" name="q" value="@Model.Query" placeholder="搜索书名/书号" />
+        <input class="form-control" name="q" value="@Model.Query" placeholder="搜索：书名 / 书号 / 分册 / 分类" />
     </div>
     <div class="col-md-2 d-grid">
         <button class="btn btn-outline-primary" type="submit">搜索</button>
@@ -24,7 +24,9 @@
         <thead>
             <tr>
                 <th>书号</th>
+                <th>分册</th>
                 <th>书名</th>
+                <th>分类</th>
                 <th class="text-end">价格</th>
                 <th class="text-end">库存</th>
                 <th></th>
@@ -35,8 +37,10 @@
             {
                 <tr>
                     <td class="text-muted">@b.BookNo</td>
+                    <td class="text-muted">@(string.IsNullOrWhiteSpace(b.VolumeNo) ? "-" : b.VolumeNo)</td>
                     <td>@b.Title</td>
-                    <td class="text-end">? @b.Price.ToString("0.00")</td>
+                    <td class="text-muted">@(string.IsNullOrWhiteSpace(b.CategoryName) ? "-" : b.CategoryName)</td>
+                    <td class="text-end">￥ @b.Price.ToString("0.00")</td>
                     <td class="text-end">@b.StockQty</td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-secondary" asp-page="/Admin/Books/Edit" asp-route-id="@b.BookId">编辑</a>

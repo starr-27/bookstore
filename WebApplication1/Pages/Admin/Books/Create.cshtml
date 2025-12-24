@@ -9,14 +9,32 @@
 
 <form method="post" class="row g-3">
     <div class="col-md-4">
-        <label class="form-label">书号</label>
+        <label class="form-label">书号（BookNo）</label>
         <input class="form-control" asp-for="Input.BookNo" />
         <span class="text-danger" asp-validation-for="Input.BookNo"></span>
     </div>
+
+    <div class="col-md-4">
+        <label class="form-label">分册标识（可选）</label>
+        <input class="form-control" asp-for="Input.VolumeNo" placeholder="例如：Vol.1 / 上册 / A" />
+        <span class="text-danger" asp-validation-for="Input.VolumeNo"></span>
+    </div>
+
     <div class="col-md-8">
         <label class="form-label">书名</label>
         <input class="form-control" asp-for="Input.Title" />
         <span class="text-danger" asp-validation-for="Input.Title"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">书目种类</label>
+        <select class="form-select" asp-for="Input.CategoryId">
+            <option value="">（未分类）</option>
+            @foreach (var c in Model.CategoryOptions)
+            {
+                <option value="@c.CategoryId">@c.CategoryName</option>
+            }
+        </select>
     </div>
 
     <div class="col-md-4">

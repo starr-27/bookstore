@@ -1,0 +1,101 @@
+@page "{id:long}"
+@model WebApplication1.Pages.Admin.PurchaseOrders.DetailsModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@{
+    ViewData["Title"] = "采购单详情";
+}
+
+@if (Model.Vm is null)
+{
+    <div class="alert alert-warning">未找到采购单</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h4 mb-0">采购单 #@Model.Vm.PurchaseOrderId</h1>
+            <div class="text-muted small">供应商：@Model.Vm.SupplierName</div>
+        </div>
+        <a class="btn btn-link" asp-page="/Admin/PurchaseOrders/Index">返回采购单列表</a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-3 small text-muted mb-2">
+                        <div>状态：<span class="badge text-bg-secondary">@Model.Vm.Status</span></div>
+                        <div>创建时间：@Model.Vm.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                        <div>到货时间：@(Model.Vm.ReceivedAt.HasValue ? Model.Vm.ReceivedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-")</div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>书号</th>
+                                    <th>分册</th>
+                                    <th>书名</th>
+                                    <th class="text-end">数量</th>
+                                    <th class="text-end">单价</th>
+                                    <th class="text-end">当前库存</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var i in Model.Vm.Items)
+                                {
+                                    <tr>
+                                        <td class="text-muted">@i.BookNo</td>
+                                        <td class="text-muted">@(string.IsNullOrWhiteSpace(i.VolumeNo) ? "-" : i.VolumeNo)</td>
+                                        <td>@i.Title</td>
+                                        <td class="text-end">@i.Qty</td>
+                                        <td class="text-end">￥ @i.UnitCost.ToString("0.00")</td>
+                                        <td class="text-end">@i.StockQty</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6">到货处理</h2>
+
+                    @if (Model.Vm.Status != WebApplication1.Data.Entities.PurchaseOrderStatus.Created)
+                    {
+                        <div class="alert alert-light border">该采购单已处理（状态：@Model.Vm.Status）。</div>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="Receive" class="row g-3">
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" asp-for="ReceiveInput.CloseOutOfStockRequests" />
+                                    <label class="form-check-label" asp-for="ReceiveInput.CloseOutOfStockRequests">同时关闭相关缺书记录</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">备注（可选）</label>
+                                <input class="form-control" asp-for="ReceiveInput.Note" placeholder="用于库存台账" />
+                                <span class="text-danger" asp-validation-for="ReceiveInput.Note"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <button class="btn btn-success" type="submit">确认到货并入库</button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

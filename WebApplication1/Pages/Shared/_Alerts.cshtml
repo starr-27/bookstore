@@ -1,0 +1,35 @@
+@{
+    var success = TempData["SuccessMessage"] as string;
+    var error = TempData["ErrorMessage"] as string;
+    var warn = TempData["WarningMessage"] as string;
+}
+
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success alert-elevated alert-soft-pink" role="alert">
+        <div class="d-flex gap-2 align-items-start">
+            <div class="alert-dot bg-success"></div>
+            <div class="flex-grow-1">@success</div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger alert-elevated" role="alert">
+        <div class="d-flex gap-2 align-items-start">
+            <div class="alert-dot bg-danger"></div>
+            <div class="flex-grow-1">@error</div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(warn))
+{
+    <div class="alert alert-warning alert-elevated" role="alert">
+        <div class="d-flex gap-2 align-items-start">
+            <div class="alert-dot bg-warning"></div>
+            <div class="flex-grow-1">@warn</div>
+        </div>
+    </div>
+}

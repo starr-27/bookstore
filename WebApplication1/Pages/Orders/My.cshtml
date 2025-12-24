@@ -1,10 +1,24 @@
 @page
 @model WebApplication1.Pages.Orders.MyModel
+@inject WebApplication1.Services.IAssetManifest Assets
+@inject WebApplication1.Services.IVisualSelector Visuals
 @{
     ViewData["Title"] = "我的订单";
 }
 
-<h1 class="h4 mb-3">我的订单</h1>
+<section class="hero mb-4">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-inner">
+        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+            <div>
+                <div class="hero-kicker">订单中心</div>
+                <h1 class="hero-title mb-1">我的订单</h1>
+                <div class="hero-subtitle">查看订单状态、金额与明细，支持快速进入详情页。</div>
+            </div>
+            <a class="btn btn-outline-primary" asp-page="/Index">继续选购</a>
+        </div>
+    </div>
+</section>
 
 @if (Model.Orders.Count == 0)
 {

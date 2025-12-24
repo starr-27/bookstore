@@ -21,9 +21,9 @@ else
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="text-muted small">当前余额</div>
-                    <div class="display-6"><span class="currency">?</span> @Model.Profile.AccountBalance.ToString("0.00")</div>
+                    <div class="display-6"><span class="currency">￥</span> @Model.Profile.AccountBalance.ToString("0.00")</div>
                     <div class="text-muted small mt-2">信用等级：L@((int)Model.Profile.CreditLevel)（折扣 @((WebApplication1.Data.Entities.CreditLevelRules.DiscountRate(Model.Profile.CreditLevel) * 100).ToString("0"))%）</div>
-                    <div class="text-muted small">透支额度：@(WebApplication1.Data.Entities.CreditLevelRules.UnlimitedOverdraft(Model.Profile.CreditLevel) ? "无限" : ("? " + Model.Profile.OverdraftLimit.ToString("0.00")))</div>
+                    <div class="text-muted small">透支额度：@(WebApplication1.Data.Entities.CreditLevelRules.UnlimitedOverdraft(Model.Profile.CreditLevel) ? "无限" : ("￥ " + Model.Profile.OverdraftLimit.ToString("0.00")))</div>
                 </div>
             </div>
         </div>

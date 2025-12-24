@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Session;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Data.Entities;
+using WebApplication1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,7 +54,13 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<WebApplication1.Services.ICartService, WebApplication1.Services.CartService>();
+
 builder.Services.AddRazorPages();
+
+builder.Services.AddSingleton<IAssetManifest, AssetManifest>();
+builder.Services.AddSingleton<IVisualSelector, VisualSelector>();
 
 var app = builder.Build();
 
@@ -83,6 +90,9 @@ app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await SeedData.EnsureSeedBooksAsync(db);
+
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
@@ -93,6 +103,11 @@ using (var scope = app.Services.CreateScope())
         {
             await roleManager.CreateAsync(new IdentityRole(role));
         }
+    }
+
+    if (!await roleManager.RoleExistsAsync("Supplier"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Supplier"));
     }
 
     var adminEmail = builder.Configuration["SeedAdmin:Email"];
@@ -120,6 +135,38 @@ using (var scope = app.Services.CreateScope())
             if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
             {
                 await userManager.AddToRoleAsync(adminUser, "Admin");
+            }
+        }
+    }
+
+    var supplierEmail = builder.Configuration["SeedSupplier:Email"];
+    var supplierPassword = builder.Configuration["SeedSupplier:Password"];
+    if (!string.IsNullOrWhiteSpace(supplierEmail) && !string.IsNullOrWhiteSpace(supplierPassword))
+    {
+        var supplierUser = await userManager.FindByEmailAsync(supplierEmail);
+        if (supplierUser is null)
+        {
+            supplierUser = new ApplicationUser
+            {
+                UserName = supplierEmail,
+                Email = supplierEmail,
+                EmailConfirmed = true,
+                UserType = UserType.Supplier
+            };
+            var supplierCreateResult = await userManager.CreateAsync(supplierUser, supplierPassword);
+            if (supplierCreateResult.Succeeded)
+            {
+                await userManager.AddToRoleAsync(supplierUser, "Supplier");
+            }
+        }
+        else
+        {
+            supplierUser.UserType = UserType.Supplier;
+            await userManager.UpdateAsync(supplierUser);
+
+            if (!await userManager.IsInRoleAsync(supplierUser, "Supplier"))
+            {
+                await userManager.AddToRoleAsync(supplierUser, "Supplier");
             }
         }
     }

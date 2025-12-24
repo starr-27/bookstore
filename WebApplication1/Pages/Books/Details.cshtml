@@ -1,5 +1,7 @@
 @page "{id:long}"
 @model WebApplication1.Pages.Books.DetailsModel
+@inject WebApplication1.Services.IAssetManifest Assets
+@inject WebApplication1.Services.IVisualSelector Visuals
 @{
     ViewData["Title"] = "书籍详情";
 }
@@ -12,33 +14,60 @@ else
 {
     <div class="row g-4">
         <div class="col-lg-8">
-            <h1 class="h4 mb-1">@Model.Book.Title</h1>
-            <div class="text-muted mb-3">@Model.Book.BookNo</div>
+            <div class="card shadow-sm app-card">
+                <div class="card-body">
+                    <div class="row g-3 align-items-start">
+                        <div class="col-md-4">
+                            @{
+                                var fallback = $"/images/book-cover-{((Model.Book.BookId % 3) + 1)}.svg";
+                                var cover = Visuals.PickStableByLong(Assets.GetFlowerCovers(), Model.Book.BookId) ?? fallback;
+                            }
+                            <div class="book-cover p-0">
+                                <img src="@cover" alt="@Model.Book.Title" />
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h1 class="h4 mb-1">@Model.Book.Title</h1>
+                            <div class="text-muted mb-3">@Model.Book.BookNo</div>
 
-            <dl class="row">
-                <dt class="col-sm-3">作者</dt>
-                <dd class="col-sm-9">@Model.Book.AuthorsText</dd>
-
-                <dt class="col-sm-3">出版社</dt>
-                <dd class="col-sm-9">@(Model.Book.PublisherName ?? "-")</dd>
-
-                <dt class="col-sm-3">关键字</dt>
-                <dd class="col-sm-9">@Model.Book.KeywordsText</dd>
-
-                <dt class="col-sm-3">供书商</dt>
-                <dd class="col-sm-9">@(Model.Book.SupplierName ?? "-")</dd>
-            </dl>
+                            <div class="details-grid">
+                                <div class="details-item">
+                                    <div class="details-label">作者</div>
+                                    <div class="details-value">@Model.Book.AuthorsText</div>
+                                </div>
+                                <div class="details-item">
+                                    <div class="details-label">出版社</div>
+                                    <div class="details-value">@(Model.Book.PublisherName ?? "-")</div>
+                                </div>
+                                <div class="details-item">
+                                    <div class="details-label">关键字</div>
+                                    <div class="details-value">@Model.Book.KeywordsText</div>
+                                </div>
+                                <div class="details-item">
+                                    <div class="details-label">供应商</div>
+                                    <div class="details-value">@(Model.Book.SupplierName ?? "-")</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="col-lg-4">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm app-card dot-card">
                 <div class="card-body">
-                    <div class="h4 mb-3">? @Model.Book.Price.ToString("0.00")</div>
-                    <div class="text-muted mb-3">库存：@Model.Book.StockQty</div>
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <div>
+                            <div class="text-muted small">当前价格</div>
+                            <div class="h4 mb-0">￥ @Model.Book.Price.ToString("0.00")</div>
+                        </div>
+                        <div class="text-muted">库存：@Model.Book.StockQty</div>
+                    </div>
 
                     @if (!User.Identity?.IsAuthenticated ?? true)
                     {
-                        <div class="alert alert-light border small">登录后可下单购买</div>
+                        <div class="alert alert-light border small">登录后才能购买</div>
                         <a class="btn btn-primary w-100" asp-page="/Account/Login">登录</a>
                     }
                     else

@@ -8,11 +8,22 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
 </head>
-<body class="bg-body-tertiary">
+@inject WebApplication1.Services.IAssetManifest Assets
+@inject WebApplication1.Services.IVisualSelector Visuals
+@{
+    var routeKey = Context?.Request?.Path.Value ?? "/";
+    var useLand = !string.Equals(routeKey, "/", StringComparison.OrdinalIgnoreCase);
+    var bg = useLand ? Visuals.PickStable(Assets.GetLandBackgrounds(), routeKey) : null;
+}
+<body class="app-body" style="--route-hero-bg: url('@(bg ?? "/images/hero-geometry.svg")');">
+    <div class="particles" aria-hidden="true"></div>
+    <div id="page-transition" class="page-transition" aria-hidden="true">
+        <div class="page-transition-bar"></div>
+    </div>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary bg-gradient border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light app-navbar border-bottom">
             <div class="container">
-                <a class="navbar-brand fw-semibold" asp-area="" asp-page="/Index">网上书店</a>
+                <a class="navbar-brand fw-semibold app-brand" asp-area="" asp-page="/Index">网上书店</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -23,10 +34,16 @@
                             <a class="nav-link" asp-area="" asp-page="/Index">书籍目录</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Cart/Index">购物车</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-page="/Orders/My">我的订单</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-page="/Account/Balance">余额/充值</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Account/Credit">信用/透支</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-page="/OutOfStock/My">缺书登记</a>
@@ -49,6 +66,9 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-page="/Admin/OutOfStock/Index">缺书处理</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Admin/PurchaseOrders/Index">采购单</a>
+                        </li>
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -57,13 +77,18 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            <div class="page-bg" aria-hidden="true"></div>
+            <partial name="_Alerts" />
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted app-footer">
         <div class="container">
-            &copy; 2025 - WebApplication1 - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
+                <div>&copy; 2025 - 网上书店</div>
+                <a class="link-secondary" asp-area="" asp-page="/Privacy">Privacy</a>
+            </div>
         </div>
     </footer>
 

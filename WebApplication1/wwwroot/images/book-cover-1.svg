@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="420" viewBox="0 0 320 420" role="img" aria-label="Book cover">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1F3B2C"/>
+      <stop offset="1" stop-color="#6B4E2E"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="18" y="10" width="280" height="400" rx="18" fill="#1B2D23" opacity="0.18"/>
+  <rect x="10" y="0" width="280" height="400" rx="18" fill="url(#bg)"/>
+  <rect x="32" y="34" width="236" height="6" rx="3" fill="#F6F3EA" opacity="0.85"/>
+  <rect x="32" y="50" width="168" height="6" rx="3" fill="#F6F3EA" opacity="0.55"/>
+
+  <g opacity="0.25">
+    <circle cx="78" cy="150" r="38" fill="#F6F3EA"/>
+    <circle cx="220" cy="120" r="56" fill="#F6F3EA"/>
+    <circle cx="210" cy="250" r="72" fill="#F6F3EA"/>
+  </g>
+
+  <path d="M40 288 C92 250, 140 320, 210 292 C240 280, 260 258, 270 238" fill="none" stroke="#F6F3EA" stroke-width="10" opacity="0.35"/>
+
+  <rect x="10" y="0" width="280" height="400" rx="18" fill="url(#shine)"/>
+  <rect x="268" y="0" width="22" height="400" rx="0" fill="#F6F3EA" opacity="0.10"/>
+</svg>

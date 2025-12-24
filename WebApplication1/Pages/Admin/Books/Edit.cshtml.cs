@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
+using WebApplication1.Data.Entities;
 
 namespace WebApplication1.Pages.Admin.Books;
 
@@ -18,12 +19,23 @@ public class EditModel : PageModel
     [BindProperty]
     public InputModel? Input { get; set; }
 
+    public List<CategoryOption> CategoryOptions { get; private set; } = new();
+
+    public class CategoryOption
+    {
+        public long CategoryId { get; set; }
+        public string CategoryName { get; set; } = default!;
+    }
+
     public class InputModel
     {
         public long BookId { get; set; }
 
         [Required, StringLength(32)]
         public string BookNo { get; set; } = string.Empty;
+
+        [StringLength(40)]
+        public string? VolumeNo { get; set; }
 
         [Required, StringLength(200)]
         public string Title { get; set; } = string.Empty;
@@ -33,10 +45,14 @@ public class EditModel : PageModel
 
         [Range(0, 1000000)]
         public uint StockQty { get; set; }
+
+        public long? CategoryId { get; set; }
     }
 
     public async Task<IActionResult> OnGetAsync(long id)
     {
+        await LoadOptionsAsync();
+
         var book = await _db.Books.AsNoTracking().FirstOrDefaultAsync(b => b.BookId == id);
         if (book is null)
         {
@@ -47,9 +63,11 @@ public class EditModel : PageModel
         {
             BookId = book.BookId,
             BookNo = book.BookNo,
+            VolumeNo = book.VolumeNo,
             Title = book.Title,
             Price = book.Price,
-            StockQty = book.StockQty
+            StockQty = book.StockQty,
+            CategoryId = book.CategoryId
         };
 
         return Page();
@@ -57,6 +75,8 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(long id)
     {
+        await LoadOptionsAsync();
+
         if (!ModelState.IsValid || Input is null)
         {
             return Page();
@@ -69,11 +89,23 @@ public class EditModel : PageModel
         }
 
         book.BookNo = Input.BookNo.Trim();
+        book.VolumeNo = string.IsNullOrWhiteSpace(Input.VolumeNo) ? null : Input.VolumeNo.Trim();
         book.Title = Input.Title.Trim();
         book.Price = Input.Price;
         book.StockQty = Input.StockQty;
+        book.CategoryId = Input.CategoryId;
+        book.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
         return RedirectToPage("/Admin/Books/Index");
+    }
+
+    private async Task LoadOptionsAsync()
+    {
+        CategoryOptions = await _db.Categories
+            .AsNoTracking()
+            .OrderBy(c => c.CategoryName)
+            .Select(c => new CategoryOption { CategoryId = c.CategoryId, CategoryName = c.CategoryName })
+            .ToListAsync();
     }
 }

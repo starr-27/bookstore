@@ -1,24 +1,110 @@
 ﻿@page
 @model IndexModel
+@inject WebApplication1.Services.IAssetManifest Assets
+@inject WebApplication1.Services.IVisualSelector Visuals
+@inject WebApplication1.Services.ICartService Cart
 @{
     ViewData["Title"] = "书籍目录";
 }
 
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <div>
-        <h1 class="h3 mb-1">书籍目录</h1>
-        <div class="text-muted">支持按书名/书号/作者/关键字搜索</div>
+<section class="mb-4">
+    <div class="card shadow-sm app-card dot-card">
+        <div class="card-body">
+            <div class="row g-3 align-items-start">
+                <div class="col-lg-8">
+                    <div class="hero-kicker">企业精神</div>
+                    <div class="h3 mb-2">以书为桥，连接知识与成长</div>
+                    <div class="text-muted">我们坚持正版可信、供应链可追溯、服务可兑现，让每一次阅读都被认真对待。</div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="details-item">
+                        <div class="details-label">使命</div>
+                        <div class="details-value">让获取好书变得更高效、更可信。</div>
+                    </div>
+                    <div class="details-item mt-2">
+                        <div class="details-label">愿景</div>
+                        <div class="details-value">打造面向未来的数字化书店服务平台。</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div class="details-grid">
+                    <div class="details-item">
+                        <div class="details-label">价值观</div>
+                        <div class="details-value">诚信 · 专业 · 透明 · 长期主义</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-label">运营承诺</div>
+                        <div class="details-value">库存与订单状态实时可见，异常处理有响应、有闭环。</div>
+                    </div>
+                </div>
+                <div class="small text-muted mt-2">注：本系统用于演示企业级流程与信用体系的落地实践，页面展示数据可能为示例数据。</div>
+            </div>
+        </div>
     </div>
-</div>
+</section>
 
-<form method="get" class="row g-2 mb-3">
-    <div class="col-sm-9 col-md-10">
-        <input class="form-control" name="q" value="@Model.Query" placeholder="输入关键词，例如：ISBN / 书名 / 作者" />
+<section class="hero mb-4">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-inner">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <div class="hero-card">
+                    <div class="hero-kicker">精选图书 · 正版保障</div>
+                    <h1 class="hero-title">发现下一本你会爱上的书</h1>
+                    <div class="hero-subtitle">支持按书名 / ISBN / 作者 / 关键字搜索，面向课堂、科研与日常阅读。</div>
+
+                    <form method="get" class="row g-2 mt-3">
+                        <div class="col-sm-8 col-md-9">
+                            <input class="form-control form-control-lg" name="q" value="@Model.Query" placeholder="输入关键词，例如：ISBN / 书名 / 作者" />
+                        </div>
+                        <div class="col-sm-4 col-md-3 d-grid">
+                            <button class="btn btn-primary btn-lg" type="submit">搜索</button>
+                        </div>
+                    </form>
+
+                    <div class="hero-hints mt-3">
+                        <span class="badge text-bg-light border">快速下单</span>
+                        <span class="badge text-bg-light border">缺书登记</span>
+                        <span class="badge text-bg-light border">信用等级折扣</span>
+                        <a class="badge text-bg-light border text-decoration-none" asp-page="/Cart/Index">
+                            购物车
+                            <span class="ms-1 badge text-bg-primary">@Cart.CountItems()</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="hero-media">
+                    <img class="img-fluid" src="~/images/feature-books.svg" alt="Books" />
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-sm-3 col-md-2 d-grid">
-        <button class="btn btn-primary" type="submit">搜索</button>
+</section>
+
+<section class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-title">企业级流程</div>
+                <div class="feature-text">从采购、入库到订单与库存，全链路可追踪。</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-title">信用体系</div>
+                <div class="feature-text">五级信用等级，折扣与透支规则清晰可控。</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-title">体验优先</div>
+                <div class="feature-text">更清爽的界面与统一提示，操作更安心。</div>
+            </div>
+        </div>
     </div>
-</form>
+</section>
 
 @if (Model.Books.Count == 0)
 {
@@ -26,17 +112,40 @@
 }
 else
 {
+    <div class="d-flex align-items-end justify-content-between mb-2">
+        <div>
+            <h2 class="h5 mb-0">最新上架</h2>
+            <div class="text-muted small">为你展示部分书目（最多 60 条）</div>
+        </div>
+    </div>
+
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
         @foreach (var b in Model.Books)
         {
             <div class="col">
-                <div class="card h-100 shadow-sm">
+                <div class="card h-100 shadow-sm app-card">
+                    <div class="book-cover">
+                        @{
+                            var fallback = $"/images/book-cover-{((b.BookId % 3) + 1)}.svg";
+                            var cover = Visuals.PickStableByLong(Assets.GetFlowerCovers(), b.BookId) ?? fallback;
+                        }
+                        <img src="@cover" alt="@b.Title" loading="lazy" />
+                    </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start gap-2">
                             <h2 class="h6 mb-1">@b.Title</h2>
                             <span class="badge text-bg-secondary">@b.StockQty</span>
                         </div>
-                        <div class="text-muted small mb-2">@b.BookNo</div>
+                        <div class="text-muted small mb-2">
+                            @b.BookNo
+                            @if (!string.IsNullOrWhiteSpace(b.VolumeNo))
+                            {
+                                <span class="ms-2">· @b.VolumeNo</span>
+                            }
+                        </div>
+                        <div class="small mb-2">
+                            <span class="text-muted">分类：</span>@(b.CategoryName ?? "-")
+                        </div>
                         <div class="small mb-2">
                             <span class="text-muted">作者：</span>@b.AuthorsText
                         </div>
@@ -46,6 +155,21 @@ else
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="fw-semibold">¥ @b.Price.ToString("0.00")</div>
                             <a class="btn btn-sm btn-outline-primary" asp-page="/Books/Details" asp-route-id="@b.BookId">查看</a>
+                        </div>
+
+                        <div class="mt-3">
+                            <form method="post" asp-page-handler="AddToCart" class="row g-2 align-items-center" data-no-transition="true">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="bookId" value="@b.BookId" />
+                                <div class="col-5">
+                                    <input class="form-control form-control-sm" name="qty" type="number" min="1" max="999" value="1" />
+                                </div>
+                                <div class="col-7 d-grid">
+                                    <button class="btn btn-sm btn-primary" type="submit" @(b.StockQty == 0 ? "disabled" : null)>
+                                        加入购物车
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

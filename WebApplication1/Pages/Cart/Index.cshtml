@@ -1,0 +1,123 @@
+@page
+@model WebApplication1.Pages.Cart.IndexModel
+@{
+    ViewData["Title"] = "购物车";
+}
+
+<section class="hero mb-4">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-inner">
+        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+            <div>
+                <div class="hero-kicker">Cart</div>
+                <h1 class="hero-title mb-1">购物车</h1>
+                <div class="hero-subtitle">一次选择多本书，统一下单。</div>
+            </div>
+            <a class="btn btn-outline-primary" asp-page="/Index">继续挑选</a>
+        </div>
+    </div>
+</section>
+
+@if (Model.Items.Count == 0)
+{
+    <div class="card shadow-sm app-card dot-card">
+        <div class="card-body">
+            <div class="h5 mb-1">购物车空空如也</div>
+            <div class="text-muted">去书籍目录把想买的书加入购物车吧。</div>
+            <div class="mt-3">
+                <a class="btn btn-primary" asp-page="/Index">去选购</a>
+            </div>
+        </div>
+    </div>
+    return;
+}
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card shadow-sm app-card">
+            <div class="card-header bg-transparent">已选书目</div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>书籍</th>
+                            <th class="text-end">单价</th>
+                            <th class="text-end">数量</th>
+                            <th class="text-end">小计</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="@i.CoverUrl" alt="@i.Title" style="width:44px;height:58px;border-radius:10px;border:1px solid rgba(31,59,44,0.12);box-shadow:0 8px 16px rgba(31,59,44,0.08);" />
+                                        <div>
+                                            <div class="fw-semibold">@i.Title</div>
+                                            <div class="text-muted small">@i.BookNo</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-end"><span class="currency">￥</span> @i.Price.ToString("0.00")</td>
+                                <td class="text-end">
+                                    <form method="post" asp-page-handler="SetQty" class="d-flex justify-content-end gap-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="bookId" value="@i.BookId" />
+                                        <input class="form-control form-control-sm" style="width:90px" name="qty" type="number" min="0" max="999" value="@i.Qty" />
+                                        <button class="btn btn-sm btn-outline-primary" type="submit">更新</button>
+                                    </form>
+                                </td>
+                                <td class="text-end"><span class="currency">￥</span> @i.LineAmount.ToString("0.00")</td>
+                                <td class="text-end">
+                                    <form method="post" asp-page-handler="Remove">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="bookId" value="@i.BookId" />
+                                        <button class="btn btn-sm btn-outline-danger" type="submit">移除</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm app-card dot-card">
+            <div class="card-body">
+                <div class="text-muted small">订单合计</div>
+                <div class="h3 mb-1"><span class="currency">￥</span> @Model.TotalAmount.ToString("0.00")</div>
+                <div class="text-muted small">请填写收货信息后提交订单</div>
+
+                <form method="post" asp-page-handler="Checkout" class="mt-3">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-2">
+                        <label class="form-label">收货人</label>
+                        <input class="form-control" asp-for="CheckoutInput.ReceiverName" />
+                        <span class="text-danger" asp-validation-for="CheckoutInput.ReceiverName"></span>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">电话</label>
+                        <input class="form-control" asp-for="CheckoutInput.ReceiverPhone" />
+                        <span class="text-danger" asp-validation-for="CheckoutInput.ReceiverPhone"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">地址</label>
+                        <textarea class="form-control" rows="2" asp-for="CheckoutInput.ReceiverAddr"></textarea>
+                        <span class="text-danger" asp-validation-for="CheckoutInput.ReceiverAddr"></span>
+                    </div>
+
+                    <button class="btn btn-success w-100" type="submit">提交订单</button>
+                    <button class="btn btn-link w-100" type="submit" formaction="?handler=Clear">清空购物车</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

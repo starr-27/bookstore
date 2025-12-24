@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="420" viewBox="0 0 320 420" role="img" aria-label="Book cover">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6B4E2E"/>
+      <stop offset="1" stop-color="#1F3B2C"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="18" y="10" width="280" height="400" rx="18" fill="#1B2D23" opacity="0.16"/>
+  <rect x="10" y="0" width="280" height="400" rx="18" fill="url(#bg)"/>
+
+  <g opacity="0.22" fill="#F6F3EA">
+    <polygon points="56,120 130,78 152,156" />
+    <polygon points="206,86 264,120 214,170" />
+    <polygon points="74,284 144,240 160,320" />
+    <polygon points="188,292 262,246 278,328" />
+  </g>
+
+  <g opacity="0.55" fill="#F6F3EA">
+    <rect x="32" y="310" width="210" height="8" rx="4"/>
+    <rect x="32" y="328" width="140" height="8" rx="4" opacity="0.7"/>
+  </g>
+
+  <rect x="268" y="0" width="22" height="400" rx="0" fill="#F6F3EA" opacity="0.10"/>
+</svg>
